@@ -1,7 +1,7 @@
 from os import listdir
 from re import sub
 import __init__ as pytg
-from os.path import isfild
+from os.path import isfile
 def loadPlugins():
 	arr=listdir("plug")
 	

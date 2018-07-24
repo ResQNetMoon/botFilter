@@ -21,6 +21,7 @@ class telegram:
 		while self.run:
 		#	new_offset = None
 			resp = get(self.uri+"/getUpdates", {'offset':new_offset, 'timeout':self.timeout}).json()
+			#try:
 			if len(resp['result']) <= 0:
 				continue
 			new_offset= str(int(resp['result'][-1]['update_id'])+1)
@@ -46,6 +47,6 @@ class Buttons:
 		return sdigit
 		
 		
-token = "token"
+token = "token this"
 
 bot = telegram(token)

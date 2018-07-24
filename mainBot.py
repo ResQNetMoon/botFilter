@@ -1,4 +1,5 @@
 from __init__ import bot, Buttons
+from re import sub, findall
 from threading import Thread
 import settings
 
@@ -8,8 +9,9 @@ btn = Buttons()
 
 
 
-def noticeSpam(text):
-	return not bool(findall(r'.VX\,QQ\(.{,4})\s*\:\s*\d*', text))
+def noticeSpam(text, maxSymbols=70):
+	print(text)
+	return len(text) >= maxSymbols
 
 
 
@@ -18,10 +20,10 @@ def noticeSpam(text):
 
 
 def rban(uid, chid):
-	bot.method("kickChatMember", {'chat_id':chid, 'user_id':chid})
+	print(bot.method("kickChatMember", {'chat_id':chid, 'user_id':uid}))
 
 def rdelete(mid, chid):
-	bot.method("deleteMessage", {'message_id':chid, 'message_id':mid})
+	bot.method("deleteMessage", {'message_id':mid, 'chat_id':chid})
 
 def delete(mid, chid):
 	Thread(target=rdelete, args=(mid, chid,)).start()
@@ -41,17 +43,20 @@ def main(handle):
 	try:
 		ifis = 'text' in handle['message'] and not str(handle['message']['chat']['id']).startswith('-')
 	except KeyError:
-		return False
+		print("False")
 	if ifis:
 		if handle['message']['text'] == '!help':
 			bot.sendMessage(hAngle, handle['message']['chat']['id'])
 		return False
 	if 'new_chat_member' in handle['message']:
+		print("member")
 		member = handle['message']['new_chat_member']
+		name = member['first_name']
 		if 'last_name' in member:
-			if noticeSpam(member['last_name']) or noticeSpam(member['first_name']):
-				delete(handle['message']['message_id'], handle['message']['chat']['id'])
-				ban(member['id'], handle['message']['chat']['id'])
+			name += " "+member['last_name']
+		if noticeSpam(name):
+			delete(handle['message']['message_id'], handle['message']['chat']['id'])
+			ban(member['id'], handle['message']['chat']['id'])
 	else:
 		if 'text' in handle['message']:
 			text = handle['message']['text'].split(' ')
